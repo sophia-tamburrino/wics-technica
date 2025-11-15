@@ -2,56 +2,59 @@ import ollama
 import pandas as pd
 import re
 
-def questions(path):
+def flashcards(path):
     #path will be a txt file.
-    
-    questions = [] # separated from classifications so its easier to parse through later on
+    notes = open(path, "r", encoding="utf-8").read()
+    df = pd.DataFrame(columns=["question", "answer"])
 
     # editing to get llama to generate a response
     # generate prompt for specific dialogue-response pair
     prompt = f"""
-    Generate a question based on a student's uploaded notes. 
-    
-    {path}
+        You are an AI assistant meant to generate flashcards from a user's imported notes. Here are the user's notes:
 
-    Your Task:
-    
-    Now it is your turn to create banter. Given Part A below, your task is to immediately provide a suitable Part B.
-    - Part A: "{dialogue}"
-    - Part B:
-    
-    IMPORTANT: Your response must start with "Part B: " followed by your suitable Part B.
+        {notes}
+        
+        Your task:
+        
+        Generate flashcards in this format- 
+        **Flashcard 1**
+        "QUESTION:" <Question>
+        "ANSWER:" <Answer>
+
+        Repeat and make 10 total flashcards to help this user study. Do not disobey the format and do not add any additional text other than the flashcards.
+
     """
+
     try:
         # generate response from llama
-        model_response = ollama.generate(model='llama3.2', prompt=prompt)
+        model_response = ollama.generate(model='llama3.2:3b', prompt=prompt)
         raw_response = model_response.get('response', '').strip()
+        print(raw_response)
+        #its annoying so we need to use regex.
+        # Pattern: matches Flashcard, QUESTION, ANSWER and strips quotes
+        pattern1 = r'QUESTION:\s*(.*)'
+        questions =  re.findall(pattern1, raw_response)
 
-        # extract classification using regex
-        match = re.search(r'Part B:', raw_response)
-        if match:
-            # classification = int(match.group(1))
-            # classifications.append(classification)
+        pattern2 = r'ANSWER:\s*(.*)'
+        answers =  re.findall(pattern2, raw_response)
 
-            # extract explanation
-            explanation_start = raw_response.find(match.group(0)) + len(match.group(0))
-            explanation = raw_response[explanation_start:].strip()
-            explanations.append(explanation)
+        print(questions)
+        print(answers)
+        df = pd.DataFrame({
+            'Questions' : questions,
+            'Answers' : answers,
+        })
 
-            # print both classification and explanation
-            print(f"Part A: {dialogue}")
-            print(f"Part B: {explanation}")
-
-            write_output(df, index, explanation)
-            
-        else:
-            raise ValueError(f"Unexpected response format: {raw_response}")
-        
-        #ERRORS GENERATE ON LINES 148, 648, 946
-        
     except Exception as e:
-        print(f"Error generating question {index}: {e}")
-        classifications.append(None)  # mark error cases
-        explanations.append(None)
+        print("ERROR", e)
 
-questions('os-notes.txt') #add path, the user-provided CSV
+    print("Final:", df)
+    return df
+
+def quiz():
+    
+
+
+
+
+flashcards('os-notes.txt') #add path, the user-provided CSV
