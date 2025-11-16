@@ -60,27 +60,28 @@
 </head>
 <body>
 
-    <h1>Enter a txt file or type/paste notes</h1>
+<h1>Enter a txt file or type/paste notes</h1>
 
-    <input 
-        type="text" 
-        class="input-box" 
-        placeholder="Enter Topic Here"
-        id="topic" 
-    >
+<input 
+    type="text" 
+    class="input-box" 
+    placeholder="Enter Topic Here"
+    id="topic" 
+>
 
-    <form action="/game" method="POST">
+<form action="/game" method="POST" enctype="multipart/form-data">
     <input name="userfile" id="userfile" type="file">
-    
 
     <textarea 
         class="notes-box" 
         placeholder="Type or paste your notes here..."
-        id="notes" 
+        id="notes"
+        name="notes"
     ></textarea>
 
-    <button id="downloadBtn">CONVERT TO TXT FILE</button> <!-- changed -->
-    <button id="nextBtn">NEXT</button>
+    <button type="button" id="downloadBtn">CONVERT TO TXT FILE</button>
+    <button type="submit" id="nextBtn">NEXT</button>
+</form>
 
     <!-- changed: added script block to convert textarea content into a downloadable .txt file -->
     <script>
