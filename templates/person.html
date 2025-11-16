@@ -80,84 +80,83 @@
 <body>
     <h1>Select your Character</h1>
 
-    <div class="viewer">
-        <div class="arrow" onclick="prevGhost()">⟵</div>
+<div class="viewer">
+    <div class="arrow" onclick="prevGhost()">⟵</div>
 
-        <div class="ghost-container">
-            <img id="ghost" src="/static/littleghost.png" class="ghost-img" alt="Ghost Option">
-            <div id="ghostName">Brother</div>
-        </div>
-
-        <div class="arrow" onclick="nextGhost()">⟶</div>
+    <div class="ghost-container">
+        <img id="ghost" src="{{ url_for('static', filename='littleghost.png') }}" class="ghost-img" alt="Ghost Option">
+        <div id="ghostName">Brother</div>
     </div>
 
-    <button onclick="selectGhost()">Select</button>
-    <button id="startBtn" onclick="startGame()">Start</button>
+    <div class="arrow" onclick="nextGhost()">⟶</div>
+</div>
 
-    <script>
-        const ghosts = [
-            "/static/littleghost.png",
-            "/static/littleghost2.png",
-            "/static/littleghost3.png",
-            "/static/littleghost8.png",
-            "/static/littleghost4.png",
-            "/static/littleghost5.png",
-            "/static/littleghost9.png",
-            "/static/littleghost6.png",
-            "/static/littleghost7.png"
-        ];
+<button onclick="selectGhost()">Select</button>
+<button id="startBtn" onclick="startGame()">Start</button>
 
-        const ghostNames = [
-            "Brother",
-            "Sister",
-            "Mother",
-            "Father",
-            "Gym Rat",
-            "Crazy",
-            "Nerd",
-            "Pirate",
-            "King"
-            
-        ];
+<script>
+    // Flask-compatible static paths
+    const ghosts = [
+        "{{ url_for('static', filename='littleghost.png') }}",
+        "{{ url_for('static', filename='littleghost2.png') }}",
+        "{{ url_for('static', filename='littleghost3.png') }}",
+        "{{ url_for('static', filename='littleghost8.png') }}",
+        "{{ url_for('static', filename='littleghost4.png') }}",
+        "{{ url_for('static', filename='littleghost5.png') }}",
+        "{{ url_for('static', filename='littleghost9.png') }}",
+        "{{ url_for('static', filename='littleghost6.png') }}",
+        "{{ url_for('static', filename='littleghost7.png') }}"
+    ];
 
-        let index = 0;
+    const ghostNames = [
+        "Brother",
+        "Sister",
+        "Mother",
+        "Father",
+        "Gym Rat",
+        "Crazy",
+        "Nerd",
+        "Pirate",
+        "King"
+    ];
 
-        function updateGhost() {
-            document.getElementById("ghost").src = ghosts[index];
-            document.getElementById("ghostName").textContent = ghostNames[index];
-        }
+    let index = 0;
 
-        function nextGhost() {
-            index = (index + 1) % ghosts.length;
-            updateGhost();
-        }
+    function updateGhost() {
+        document.getElementById("ghost").src = ghosts[index];
+        document.getElementById("ghostName").textContent = ghostNames[index];
+    }
 
-        function prevGhost() {
-            index = (index - 1 + ghosts.length) % ghosts.length;
-            updateGhost();
-        }
+    function nextGhost() {
+        index = (index + 1) % ghosts.length;
+        updateGhost();
+    }
 
-function selectGhost() {
-            // save selection so the game page can read it later  // changed
-            localStorage.setItem("selectedGhostIndex", index);          // changed
-            localStorage.setItem("selectedGhostName", ghostNames[index]); // changed
-            localStorage.setItem("selectedGhostImage", ghosts[index]);    // changed
+    function prevGhost() {
+        index = (index - 1 + ghosts.length) % ghosts.length;
+        updateGhost();
+    }
 
-            alert("Selected ghost: " + ghostNames[index]);
-        }
+    function selectGhost() {
+        localStorage.setItem("selectedGhostIndex", index);
+        localStorage.setItem("selectedGhostName", ghostNames[index]);
+        localStorage.setItem("selectedGhostImage", ghosts[index]);
 
-        function startGame() {
-            // ensure the current selection is stored before starting the game  // changed
-            localStorage.setItem("selectedGhostIndex", index);          // changed
-            localStorage.setItem("selectedGhostName", ghostNames[index]); // changed
-            localStorage.setItem("selectedGhostImage", ghosts[index]);    // changed
+        alert("Selected ghost: " + ghostNames[index]);
+    }
 
-            // go to the actual game page                                  // changed
-            window.location.href = "game.html";                           // changed
-        }
+    function startGame() {
+        // store selection before switching pages
+        localStorage.setItem("selectedGhostIndex", index);
+        localStorage.setItem("selectedGhostName", ghostNames[index]);
+        localStorage.setItem("selectedGhostImage", ghosts[index]);
 
-        // make sure initial ghost state is synced with index = 0          // changed
-        updateGhost();                                                    // changed
-    </script>
+        // go to Flask's game route
+        window.location.href = "{{ url_for('game') }}";
+    }
+
+    updateGhost();
+</script>
+
 </body>
 </html>

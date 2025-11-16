@@ -4,7 +4,8 @@ import re
 
 def flashcards(path):
     #path will be a txt file.
-    notes = open(path, "r", encoding="utf-8").read()
+    print("PATH: ", path)
+    notes = path
     df = pd.DataFrame(columns=["question", "answer"])
     print("Generating 1")
     # editing to get llama to generate a response
@@ -21,7 +22,7 @@ def flashcards(path):
         "QUESTION:" <Question>
         "ANSWER:" <Answer>
 
-        Repeat and make 8 total flashcards to help this user study. Do not disobey the format and do not add any additional text other than the flashcards.
+        Repeat and make 4 total flashcards to help this user study. Do not disobey the format and do not add any additional text other than the flashcards.
 
     """
 

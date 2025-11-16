@@ -1,15 +1,14 @@
 from flask import Flask, request, session, render_template, redirect, url_for
-import uuid
-import os
-from questions import flashcards, quiz
+from questions import flashcards
 
 app = Flask(__name__)
-app.secret_key = "string"
+app.secret_key = "your-secret-key"
 
-UPLOAD_FOLDER = "uploads"
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+# ------------------------
+# ROUTES
+# ------------------------
 
-@app.route('/', methods=['GET'])
+@app.route('/')
 def index():
     return render_template("index.html")
 
@@ -19,34 +18,33 @@ def page2():
 
 @app.route('/person', methods=['POST'])
 def person():
-    """
-    Page2 submits the uploaded file OR notes here.
-    We store the content in session, but DO NOT run the AI yet.
-    """
     uploaded_file = request.files.get("userfile")
-    notes = request.form.get("notes")
+    notes_text = request.form.get("notes", "").strip()
 
     if uploaded_file and uploaded_file.filename != "":
         session["file_text"] = uploaded_file.read().decode("utf-8")
+    elif notes_text:
+        session["file_text"] = notes_text
     else:
-        session["file_text"] = notes
-    
+        session["file_text"] = ""
+
+    # Redirect to ghost selection page
+    return redirect(url_for('person_select'))  # create a new route for ghost selection
+
+# New route for ghost selection page
+@app.route('/person_select')
+def person_select():
     return render_template("person.html")
 
-
-@app.route('/game', methods=['POST', 'GET'])
+@app.route('/game')
 def game():
-    """
-    Person page submits 'Start Game' button → generate flashcards + quiz here.
-    """
-    text = session.get("file_text", "")
+    notes_text = session.get("file_text", "").strip()
+    if not notes_text:
+        return "Error: No notes/text found. Go back and provide a file or type notes."
 
-    flashcard_df = flashcards(text)     # generate flashcards
-    quiz_df = quiz(flashcard_df)        # generate quiz
+    flashcard_df = flashcards(notes_text)
 
-    return render_template("game.html",
-                           flashcard_df=flashcard_df,
-                           quiz_df=quiz_df)
+    return render_template("game.html", flashcard_df=flashcard_df)
 
-
-app.run(host='0.0.0.0', port=8080)
+if __name__ == "__main__":
+    app.run(debug=True)
