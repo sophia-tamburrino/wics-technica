@@ -21,7 +21,7 @@ def flashcards(path):
         "QUESTION:" <Question>
         "ANSWER:" <Answer>
 
-        Repeat and make 10 total flashcards to help this user study. Do not disobey the format and do not add any additional text other than the flashcards.
+        Repeat and make 8 total flashcards to help this user study. Do not disobey the format and do not add any additional text other than the flashcards.
 
     """
 
@@ -116,5 +116,3 @@ def quiz(original_df):
     print("Final:", df)
     return df
 
-df1 = flashcards('os-notes.txt')
-df2 = quiz(df1)

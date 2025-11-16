@@ -5,7 +5,7 @@
     <title>Notes Page</title>
     <style>
         body {
-            background-image: url("/assets/spooky-bg.gif");  /* we'll fix path in step 2 */
+            background-image: url("/static/spooky-bg.gif");  /* we'll fix path in step 2 */
             background-repeat: no-repeat;
             background-size: cover;
             background-position: center;
@@ -69,7 +69,9 @@
         id="topic" 
     >
 
-    <input type="file">
+    <form action="/loading" method="GET">
+    <input name="userfile" id="userfile" type="file">
+    </form>
 
     <textarea 
         class="notes-box" 
@@ -112,8 +114,14 @@
 
     <script>
       // existing script for "CONVERT TO TXT FILE" can stay above this
-
-      async function startSessionAndGoToGame() {
+        var filepath = document.getElementById('userfile')
+        
+      
+      
+      
+      
+      
+        async function startSessionAndGoToGame() {
         try {
           // You can choose any number of lessons; using 3 as an example
           const res = await fetch("http://127.0.0.1:5000/start-session", {
