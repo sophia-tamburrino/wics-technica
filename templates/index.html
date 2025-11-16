@@ -5,7 +5,7 @@
     <title>Working Title</title>
     <style>
         body {
-            background-image: url("/assets/spooky-bg.gif");  /* we'll fix path in step 2 */
+            background-image: url("/static/spooky-bg.gif");  /* we'll fix path in step 2 */
             background-size: cover;
             color: rgb(0, 255, 213);
             font-family: Arial, sans-serif;
@@ -58,7 +58,7 @@
         • Have fun and good luck!
     </p>
 
-    <a href="page2.html">
+    <a href="{{ url_for('page2') }}">
         <button>START</button>
     </a>
 

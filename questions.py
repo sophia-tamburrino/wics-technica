@@ -6,7 +6,7 @@ def flashcards(path):
     #path will be a txt file.
     notes = open(path, "r", encoding="utf-8").read()
     df = pd.DataFrame(columns=["question", "answer"])
-
+    print("Generating 1")
     # editing to get llama to generate a response
     # generate prompt for specific dialogue-response pair
     prompt = f"""
@@ -21,7 +21,7 @@ def flashcards(path):
         "QUESTION:" <Question>
         "ANSWER:" <Answer>
 
-        Repeat and make 10 total flashcards to help this user study. Do not disobey the format and do not add any additional text other than the flashcards.
+        Repeat and make 8 total flashcards to help this user study. Do not disobey the format and do not add any additional text other than the flashcards.
 
     """
 
@@ -54,7 +54,7 @@ def flashcards(path):
 def quiz(original_df):
 
     df = pd.DataFrame(columns=["Option 1", "Option 2", "Option 3", "Option 4", "Answer Key"])
-
+    print("Generating 2")
     prompt = f"""
         You are an AI assistant meant to generate a quiz from a user's imported flashcards. Here are the flashcards:
 
@@ -116,5 +116,3 @@ def quiz(original_df):
     print("Final:", df)
     return df
 
-df1 = flashcards('os-notes.txt')
-df2 = quiz(df1)

@@ -5,7 +5,7 @@
     <title>Notes Page</title>
     <style>
         body {
-            background-image: url("/assets/spooky-bg.gif");  /* we'll fix path in step 2 */
+            background-image: url("/static/spooky-bg.gif");  /* we'll fix path in step 2 */
             background-repeat: no-repeat;
             background-size: cover;
             background-position: center;
@@ -60,25 +60,18 @@
 </head>
 <body>
 
-    <h1>Enter a txt file or type/paste notes</h1>
-
-    <input 
-        type="text" 
-        class="input-box" 
-        placeholder="Enter Topic Here"
-        id="topic" 
-    >
-
-    <input type="file">
+<form action="/person" method="POST" enctype="multipart/form-data">
+    <input name="userfile" id="userfile" type="file">
 
     <textarea 
         class="notes-box" 
         placeholder="Type or paste your notes here..."
         id="notes" 
+        name="notes"
     ></textarea>
-
-    <button id="downloadBtn">CONVERT TO TXT FILE</button> <!-- changed -->
-    <button id="nextBtn">NEXT</button>
+    <button type="button" id="downloadBtn">CONVERT TO TXT FILE</button>
+    <button type="submit" id="nextBtn">NEXT</button>
+</form>
 
     <!-- changed: added script block to convert textarea content into a downloadable .txt file -->
     <script>
@@ -109,39 +102,5 @@
         });
     </script>
     <!-- end changed -->
-
-    <script>
-      // existing script for "CONVERT TO TXT FILE" can stay above this
-
-      async function startSessionAndGoToGame() {
-        try {
-          // You can choose any number of lessons; using 3 as an example
-          const res = await fetch("http://127.0.0.1:5000/start-session", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ num_lessons: 3 })
-          });
-
-          if (!res.ok) {
-            throw new Error("Backend error");
-          }
-
-          const data = await res.json();
-          console.log("Session started:", data);
-
-          // Save the session id so the next page / game can use it
-          localStorage.setItem("session_id", data.session_id);
-
-          // Go to the character selection page instead of game.html   // changed
-          window.location.href = "person.html";                        // changed
-        } catch (err) {
-          console.error(err);
-          alert("Could not talk to the backend. Is app.py running?");
-        }
-      }
-
-      document.getElementById("nextBtn")
-        .addEventListener("click", startSessionAndGoToGame);
-    </script>
 </body>
 </html>
