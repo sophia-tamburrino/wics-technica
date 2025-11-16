@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ghost Selector</title>
+    <style>
+        body {
+            background: url("halloweenbackground.gif") no-repeat center center fixed;
+   background-size: cover;
+   color: white;
+   font-family: Arial, sans-serif;
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   padding: 20px;
+
+        }
+
+        .viewer {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .ghost-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .ghost-img {
+            width: 250px;
+            height: auto;
+        }
+
+        .arrow {
+            font-size: 40px;
+            cursor: pointer;
+            padding: 20px;
+            transition: 0.2s;
+        }
+
+        .arrow:hover {
+            transform: scale(1.2);
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            border: none;
+            background: #ff00b7;
+            color: white;
+            font-size: 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            background: #ffa53b;
+        }
+
+        #startBtn {
+            background: #a300c8;
+        }
+
+        #startBtn:hover {
+            background: #873af2;
+        }
+
+        #ghostName {
+            margin-top: 10px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Select your Character</h1>
+
+    <div class="viewer">
+        <div class="arrow" onclick="prevGhost()">⟵</div>
+
+        <div class="ghost-container">
+            <img id="ghost" src="littleghost.png" class="ghost-img" alt="Ghost Option">
+            <div id="ghostName">Brother</div>
+        </div>
+
+        <div class="arrow" onclick="nextGhost()">⟶</div>
+    </div>
+
+    <button onclick="selectGhost()">Select</button>
+    <button id="startBtn" onclick="startGame()">Start</button>
+
+    <script>
+        const ghosts = [
+            "littleghost.png",
+            "littleghost2.png",
+            "littleghost3.png",
+            "littleghost8.png",
+            "littleghost4.png",
+            "littleghost5.png",
+            "littleghost9.png",
+            "littleghost6.png",
+            "littleghost7.png"
+        ];
+
+        const ghostNames = [
+            "Brother",
+            "Sister",
+            "Mother",
+            "Father",
+            "Gym Rat",
+            "Crazy",
+            "Nerd",
+            "Pirate",
+            "King"
+            
+        ];
+
+        let index = 0;
+
+        function updateGhost() {
+            document.getElementById("ghost").src = ghosts[index];
+            document.getElementById("ghostName").textContent = ghostNames[index];
+        }
+
+        function nextGhost() {
+            index = (index + 1) % ghosts.length;
+            updateGhost();
+
+
+        function prevGhost() {
+            index = (index - 1 + ghosts.length) % ghosts.length;
+            updateGhost();
+        }
+
+        function selectGhost() {
+            alert("Selected ghost: " + ghostNames[index]);
+        }
+
+        function startGame() {
+            alert("Starting game with: " + ghostNames[index]);
+        }
+    </script>
+</body>
+</html>
