@@ -17,46 +17,36 @@ def index():
 def page2():
     return render_template("page2.html")
 
-@app.route('/game', methods=['POST'])
-def game():
-    # File comes from the form
-    uploaded = request.files.get('userfile')
-
-    if not uploaded:
-        return "No file uploaded", 400
-
-    # Save file temporarily
-    filename = str(uuid.uuid4()) + ".txt"
-    filepath = os.path.join(UPLOAD_FOLDER, filename)
-    uploaded.save(filepath)
-
-    # Store path for loading() to read
-    session['filepath'] = filepath
-
-    # Go to loading screen
-    return redirect(url_for('loading'))
-
-
-@app.route('/loading', methods=['GET'])
-def loading():
-    filepath = session.get('filepath')
-
-    if not filepath:
-        return "File path missing", 400
-
-    # Compute results
-    flashcard_data = flashcards(filepath)
-    quiz_data = quiz(flashcard_data)
-
-    # Show game page
-    return render_template(
-        "game.html",
-        flashcard_df=flashcard_data,
-        quiz_df=quiz_data
-    )
-
-@app.route('/person', methods=['GET'])
+@app.route('/person', methods=['POST'])
 def person():
+    """
+    Page2 submits the uploaded file OR notes here.
+    We store the content in session, but DO NOT run the AI yet.
+    """
+    uploaded_file = request.files.get("userfile")
+    notes = request.form.get("notes")
+
+    if uploaded_file and uploaded_file.filename != "":
+        session["file_text"] = uploaded_file.read().decode("utf-8")
+    else:
+        session["file_text"] = notes
+    
     return render_template("person.html")
+
+
+@app.route('/game', methods=['POST', 'GET'])
+def game():
+    """
+    Person page submits 'Start Game' button → generate flashcards + quiz here.
+    """
+    text = session.get("file_text", "")
+
+    flashcard_df = flashcards(text)     # generate flashcards
+    quiz_df = quiz(flashcard_df)        # generate quiz
+
+    return render_template("game.html",
+                           flashcard_df=flashcard_df,
+                           quiz_df=quiz_df)
+
 
 app.run(host='0.0.0.0', port=8080)
