@@ -1,17 +1,15 @@
 <!DOCTYPE html>
-<link rel="stylesheet" href="style.css" />
-
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Game Over – Game Name</title>
+  <title>Game Over – Spooky Studying</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
-<body>
+<body class="gameover-page">
   <main>
     <h1>Game Over</h1>
 
     <section id="results">
-      <!--  placeholders -->
       <p id="summary-text">
         You completed the maze and reunited with <strong>X</strong> out of <strong>Y</strong> ghosts!
       </p>
@@ -25,5 +23,27 @@
       <button onclick="window.location.href='index.html'">Back to Home</button>
     </section>
   </main>
+
+  <script>
+    (function () {
+      const score = localStorage.getItem("finalScore") || "0";
+      const collected = localStorage.getItem("collectedFamilyCount") || "0";
+      const total =
+        localStorage.getItem("totalFamilyCount") || collected || "0";
+
+      const summaryEl = document.getElementById("summary-text");
+      const scoreEl = document.getElementById("score-text");
+
+      summaryEl.innerHTML =
+        'You completed the maze and reunited with <strong>' +
+        collected +
+        "</strong> out of <strong>" +
+        total +
+        "</strong> ghosts!";
+
+      scoreEl.innerHTML =
+        "Final Score: <strong>" + score + "</strong>";
+    })();
+  </script>
 </body>
 </html>

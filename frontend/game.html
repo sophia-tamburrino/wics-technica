@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-<link rel="stylesheet" href="style.css" />
-
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Game – Name </title>
+  <title>Spooky Studying – Game</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <header>
@@ -16,64 +15,35 @@
   </header>
 
   <main>
+    <!-- Help panel (matches your existing CSS for #help) -->
     <section id="help" style="display:none;">
       <h2>How to Play</h2>
       <p>
-        Move through the maze, reach checkpoints to see flashcards, and find ghosts
-        to take quizzes. Answer correctly to reunite your ghost family!
+        Move through the maze, collect pumpkins for points, and reunite your ghost family.
+        Checkpoints will pull flashcards from the AI backend, and the enemy ghost will end
+        your run if it reaches you.
       </p>
       <button onclick="document.getElementById('help').style.display='none'">
         Close
       </button>
     </section>
 
+    <!-- Main game container (already styled in style.css) -->
     <section id="game-container">
-      <!-- GameMaker HTML export can be embedded here later -->
-      <p>Game goes here (embed GameMaker HTML/Canvas).</p>
+      <canvas id="game-canvas" width="800" height="545"></canvas>
     </section>
+
+    <!-- Checkpoint flashcard overlay -->
+    <div id="checkpoint-overlay" class="overlay hidden">
+      <div class="overlay-content">
+        <h2 id="checkpoint-title">Checkpoint!</h2>
+        <div id="checkpoint-cards"></div>
+        <button id="checkpoint-close">Continue</button>
+      </div>
+    </div>
   </main>
-  <script>
-  // Get the session id we saved in page2.html
-  const sessionId = localStorage.getItem("session_id");
 
-  if (!sessionId) {
-    // If there is no session, send them back to notes page
-    window.location.href = "page2.html";
-  } else {
-    console.log("Using session:", sessionId);
-  }
-
-  async function loadFirstCheckpoint() {
-    try {
-      const url = `http://127.0.0.1:5000/checkpoint?session_id=${encodeURIComponent(
-        sessionId
-      )}&lesson=1&checkpoint=0`;
-
-      const res = await fetch(url);
-      if (!res.ok) {
-        throw new Error("Backend error");
-      }
-
-      const data = await res.json();
-      console.log("Flashcards from backend:", data.flashcards);
-
-      // For now, just show the first flashcard text on the page
-      const container = document.getElementById("game-container");
-      const fc = data.flashcards[0];
-
-      const card = document.createElement("div");
-      card.innerHTML = `
-        <h2>${fc.front}</h2>
-        <p>${fc.back}</p>
-      `;
-      container.appendChild(card);
-    } catch (err) {
-      console.error(err);
-    }
-  }
-
-  loadFirstCheckpoint();
-</script>
-
+  <!-- Game logic -->
+  <script src="game.js"></script>
 </body>
 </html>
