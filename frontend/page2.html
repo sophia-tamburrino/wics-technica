@@ -78,7 +78,8 @@
     ></textarea>
 
     <button id="downloadBtn">CONVERT TO TXT FILE</button> <!-- changed -->
-    <button>NEXT</button>
+    <button id="nextBtn">NEXT</button>
+
     
     <!-- changed: added script block to convert textarea content into a downloadable .txt file -->
     <script>
@@ -109,6 +110,39 @@
         });
     </script>
     <!-- end changed -->
+<script>
+  // existing script for "CONVERT TO TXT FILE" can stay above this
 
+  async function startSessionAndGoToGame() {
+    try {
+      // You can choose any number of lessons; using 3 as an example
+      const res = await fetch("http://127.0.0.1:5000/start-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ num_lessons: 3 })
+      });
+
+      if (!res.ok) {
+        throw new Error("Backend error");
+      }
+
+      const data = await res.json();
+      console.log("Session started:", data);
+
+      // Save the session id so game.html can use it
+      localStorage.setItem("session_id", data.session_id);
+
+      // Go to the game page
+      window.location.href = "game.html";
+    } catch (err) {
+      console.error(err);
+      alert("Could not talk to the backend. Is app.py running?");
+    }
+  }
+
+  document.getElementById("nextBtn")
+    .addEventListener("click", startSessionAndGoToGame);
+</script>
 </body>
+
 </html>
