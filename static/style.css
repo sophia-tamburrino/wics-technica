@@ -228,3 +228,96 @@ main > section button:active {
     flex-wrap: wrap;
   }
 }
+/* ===========================
+   CANVAS GAME + OVERLAY
+   =========================== */
+
+#game-canvas {
+  image-rendering: pixelated;
+  border-radius: 16px;
+  border: 3px solid #ffffff;
+  background-color: #05020a;
+  max-width: 100%;
+}
+
+/* Checkpoint overlay */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.overlay-content {
+  background: #050109;
+  border-radius: 16px;
+  border: 3px solid #3ef0ff;
+  padding: 16px 20px;
+  max-width: 640px;
+  width: 90%;
+  box-shadow:
+    0 0 0 4px #000000,
+    0 0 20px rgba(62, 240, 255, 0.8);
+  text-align: left;
+}
+
+.overlay-content h2 {
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+#checkpoint-cards {
+  max-height: 300px;
+  overflow-y: auto;
+  margin-bottom: 12px;
+  color: #ffeefc; 
+}
+
+.checkpoint-card {
+  border: 2px solid #ffe06f;
+  padding: 10px;
+  margin-bottom: 8px;
+  background: #130319;
+  color: #ffeefc; 
+}
+
+.checkpoint-card h3 {
+  font-size: 12px;
+  margin-bottom: 4px;
+  color: #ffeefc; 
+}
+
+.checkpoint-card p {
+  font-size: 10px;
+  color: #ffeefc; 
+}
+
+.overlay-content button {
+  font-family: "Press Start 2P", system-ui, sans-serif;
+  font-size: 10px;
+  padding: 6px 18px;
+  border-radius: 999px;
+  border: 2px solid #ffe06f;
+  background-color: #ff3155;
+  color: #ffeefc;
+  cursor: pointer;
+  text-transform: uppercase;
+}
+
+.overlay-content button:hover {
+  background-color: #ffe06f;
+  color: #2b0613;
+}
+
+.hidden {
+  display: none;
+}
+
+/* Make Game Over page text white */
+body.gameover-page,
+body.gameover-page * {
+  color: #ffffff !important;
+}
