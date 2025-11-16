@@ -6,7 +6,7 @@
     <title>Ghost Selector</title>
     <style>
         body {
-            background: url("halloweenbackground.gif") no-repeat center center fixed;
+            background: url("/assets/spooky-bg.gif") no-repeat center center fixed;
    background-size: cover;
    color: white;
    font-family: Arial, sans-serif;
@@ -84,7 +84,7 @@
         <div class="arrow" onclick="prevGhost()">⟵</div>
 
         <div class="ghost-container">
-            <img id="ghost" src="littleghost.png" class="ghost-img" alt="Ghost Option">
+            <img id="ghost" src="/assets/littleghost.png" class="ghost-img" alt="Ghost Option">
             <div id="ghostName">Brother</div>
         </div>
 
@@ -96,15 +96,15 @@
 
     <script>
         const ghosts = [
-            "littleghost.png",
-            "littleghost2.png",
-            "littleghost3.png",
-            "littleghost8.png",
-            "littleghost4.png",
-            "littleghost5.png",
-            "littleghost9.png",
-            "littleghost6.png",
-            "littleghost7.png"
+            "/assets/littleghost.png",
+            "/assets/littleghost2.png",
+            "/assets/littleghost3.png",
+            "/assets/littleghost8.png",
+            "/assets/littleghost4.png",
+            "/assets/littleghost5.png",
+            "/assets/littleghost9.png",
+            "/assets/littleghost6.png",
+            "/assets/littleghost7.png"
         ];
 
         const ghostNames = [
@@ -130,20 +130,34 @@
         function nextGhost() {
             index = (index + 1) % ghosts.length;
             updateGhost();
-
+        }
 
         function prevGhost() {
             index = (index - 1 + ghosts.length) % ghosts.length;
             updateGhost();
         }
 
-        function selectGhost() {
+function selectGhost() {
+            // save selection so the game page can read it later  // changed
+            localStorage.setItem("selectedGhostIndex", index);          // changed
+            localStorage.setItem("selectedGhostName", ghostNames[index]); // changed
+            localStorage.setItem("selectedGhostImage", ghosts[index]);    // changed
+
             alert("Selected ghost: " + ghostNames[index]);
         }
 
         function startGame() {
-            alert("Starting game with: " + ghostNames[index]);
+            // ensure the current selection is stored before starting the game  // changed
+            localStorage.setItem("selectedGhostIndex", index);          // changed
+            localStorage.setItem("selectedGhostName", ghostNames[index]); // changed
+            localStorage.setItem("selectedGhostImage", ghosts[index]);    // changed
+
+            // go to the actual game page                                  // changed
+            window.location.href = "game.html";                           // changed
         }
+
+        // make sure initial ghost state is synced with index = 0          // changed
+        updateGhost();                                                    // changed
     </script>
 </body>
 </html>
