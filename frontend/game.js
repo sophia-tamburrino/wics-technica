@@ -13,7 +13,7 @@
 
   const API_BASE = "http://127.0.0.1:5000"; // adjust if your Flask host/port differ
 
-  // Selected character from person.html
+  // Selected character from person.html (player sprite)
   const selectedGhostImagePath = localStorage.getItem("selectedGhostImage") || null;
   let selectedGhostImage = null;
   if (selectedGhostImagePath) {
@@ -32,34 +32,52 @@
   const ROWS = Math.floor(canvas.height / TILE);
 
   // -----------------------------
+  // Sprite loading (your assets)
+  // -----------------------------
+  const sprites = {
+    pumpkin: new Image(),
+    enemy: new Image(),
+    family: [
+      new Image(),
+      new Image(),
+      new Image(),
+      new Image()
+    ]
+  };
+
+  // IMPORTANT: assets are in ../assets relative to frontend/
+  sprites.pumpkin.src = "../assets/pumpkin.png"; // collectible
+  sprites.enemy.src = "../assets/witch.png";      // enemy
+
+  sprites.family[0].src = "../assets/family1.png";
+  sprites.family[1].src = "../assets/family2.png";
+  sprites.family[2].src = "../assets/family3.png";
+  sprites.family[3].src = "../assets/family4.png";
+
+  // -----------------------------
   // Map layout
   // W = wall, . = pumpkin, P = player, E = enemy, F = family, C = checkpoint
   // -----------------------------
-  const RAW_MAP = [
-    "WWWWWWWWWWWWWWWWWWWWWWWWW",
-    "W....C........W....C....W",
-    "W.WWW.WWWWWWW.W.WWWWW.W.W",
-    "W.P..W.......W.W.....W.WW",
-    "W.WWW.WWWWW.WW.W.WWW.W..W",
-    "W.....W...W....W.W...W..W",
-    "WWWWW.W.W.WWWWWW.W.W.W..W",
-    "W.....W.W....E.....W....W",
-    "W.WWWWW.WWWWWWWWWWWW.WWWW",
-    "W.W.....W...........W..FW",
-    "W.W.WWWWW.WWWWWWWWW.W.W.W",
-    "W...W.....W.......W...W.W",
-    "WWW.W.WWWWW.WWWWW.WWW.W.W",
-    "W...W.W.....W.....W...W.W",
-    "W.WWW.W.WWW.W.WWW.W.WWW.W",
-    "W.W...W.W...W.W...W.W...W",
-    "W.W.WWW.WWWWW.WWWWW.W.W.W",
-    "W.W.W....C..........W.W.W",
-    "W.W.WWWWWWWWWWWWWWWWW.W.W",
-    "W.W...................W.W",
-    "W.WWWWWWWWWWWWWWWWWWWWW.W",
-    "W.F.................F..FW",
-    "WWWWWWWWWWWWWWWWWWWWWWWWW"
-  ];
+ const RAW_MAP = [
+  "WWWWWWWWWWWWWWWWWWWWWWWWW", 
+  "WF....W....C...P..W.E.F.W", 
+  "W.....W........P..W.....W", 
+  "W..W.....WWWWWWW..C..W..W", 
+  "W..W.................W..W", 
+  "W..WWW.............WWW..W", 
+  "W..W.................W..WW", 
+  "W..W....WWW...WWW....W..W", 
+  "W...........P...........WW", 
+  "W...C...................W", 
+  "W.......WWW...WWW.......W", 
+  "W..WWW.............WWW..W", 
+  "W..W.................W..W", 
+  "W..W.....WWWWWWW.....W..W", 
+  "WF.E..W.....C.....W...F.W", 
+  "W.....W...........W.....W", 
+  "WWWWWWWWWWWWWWWWWWWWWWWWW"  
+];
+
 
   const MAP = [];
   for (let r = 0; r < ROWS; r++) {
@@ -123,12 +141,12 @@
   }
 
   // -----------------------------
-  // Player
+  // Player (uses selectedGhostImage if present)
   // -----------------------------
   class Player extends RectEntity {
     constructor(x, y) {
-      super(x, y, TILE * 0.8, TILE * 0.8);
-      this.speed = 5;
+      super(x, y, TILE * 1.5, TILE * 1.5);
+      this.speed = 2;
       this.color = "#7fffff";
     }
 
@@ -167,12 +185,12 @@
   }
 
   // -----------------------------
-  // Enemy ghost
+  // Enemy ghost (uses witch.png)
   // -----------------------------
   class Enemy extends RectEntity {
     constructor(x, y) {
-      super(x, y, TILE * 0.8, TILE * 0.8);
-      this.speed = 1.5;
+      super(x, y, TILE * 1.5, TILE * 1.5);
+      this.speed = 1;
       this.color = "#ff4081";
     }
 
@@ -201,11 +219,16 @@
     }
 
     draw(ctx) {
-      ctx.fillStyle = this.color;
-      ctx.beginPath();
-      ctx.arc(this.cx, this.cy, this.w / 2, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillRect(this.x, this.y + this.h * 0.3, this.w, this.h * 0.7);
+      if (sprites.enemy.complete) {
+        ctx.drawImage(sprites.enemy, this.x, this.y, this.w, this.h);
+      } else {
+        // fallback ghost shape
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.cx, this.cy, this.w / 2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillRect(this.x, this.y + this.h * 0.3, this.w, this.h * 0.7);
+      }
     }
   }
 
@@ -220,7 +243,7 @@
   }
 
   // -----------------------------
-  // Pumpkins (points)
+  // Pumpkins (collectible, uses pumpkin.png)
   // -----------------------------
   class Pumpkin extends RectEntity {
     constructor(x, y) {
@@ -228,43 +251,63 @@
       this.points = 5;
     }
     draw(ctx) {
-      ctx.fillStyle = "#ffa500";
-      ctx.beginPath();
-      ctx.arc(this.cx, this.cy, this.w / 2, 0, Math.PI * 2);
-      ctx.fill();
+      if (sprites.pumpkin.complete) {
+        ctx.drawImage(sprites.pumpkin, this.x, this.y, this.w, this.h);
+      } else {
+        // fallback if image not loaded yet
+        ctx.fillStyle = "#ffa500";
+        ctx.beginPath();
+        ctx.arc(this.cx, this.cy, this.w / 2, 0, Math.PI * 2);
+        ctx.fill();
+      }
     }
   }
 
   // -----------------------------
-  // Family members
+  // Family members (family1–4.png)
   // -----------------------------
   class FamilyMember extends RectEntity {
-    constructor(x, y) {
-      super(x + TILE * 0.1, y + TILE * 0.1, TILE * 0.8, TILE * 0.8);
+    constructor(x, y, index) {
+      super(x + TILE * 0.1, y + TILE * 0.1, TILE * 1.5, TILE * 1.5);
       this.collected = false;
       this.icon_x = 490;
       this.icon_y = 740;
       this.icon_spacing = 40;
       this.color = "#a6ffcb";
+      this.index = index; // which family sprite to use (0–3)
     }
 
     draw(ctx) {
       if (this.collected) return;
-      ctx.fillStyle = this.color;
-      ctx.fillRect(this.x, this.y, this.w, this.h);
-      ctx.fillStyle = "#000000";
-      ctx.font = "10px 'Press Start 2P', monospace";
-      ctx.fillText("F", this.x + 4, this.y + 14);
+
+      const img = sprites.family[this.index % sprites.family.length];
+
+      if (img && img.complete) {
+        ctx.drawImage(img, this.x, this.y, this.w, this.h);
+      } else {
+        // fallback box
+        ctx.fillStyle = this.color;
+        ctx.fillRect(this.x, this.y, this.w, this.h);
+        ctx.fillStyle = "#000000";
+        ctx.font = "10px 'Press Start 2P', monospace";
+        ctx.fillText("F", this.x + 4, this.y + 14);
+      }
     }
 
     drawCollectedIcon(ctx, offsetIndex) {
       const x = this.icon_x + (offsetIndex * this.icon_spacing);
       const y = this.icon_y;
-      ctx.fillStyle = this.color;
-      ctx.fillRect(x, y, TILE * 0.8, TILE * 0.8);
-      ctx.fillStyle = "#000000";
-      ctx.font = "10px 'Press Start 2P', monospace";
-      ctx.fillText("F", x + 4, y + 14);
+      const img = sprites.family[this.index % sprites.family.length];
+
+      if (img && img.complete) {
+        ctx.drawImage(img, x, y, TILE * 1.5, TILE * 1.5);
+      } else {
+        ctx.fillStyle = this.color;
+        ctx.fillRect(x, y, TILE * 0.8, TILE * 0.8);
+        ctx.fillStyle = "#000000";
+        ctx.font = "10px 'Press Start 2P', monospace";
+        ctx.fillText("F", x + 4, y + 14);
+      }
     }
   }
 
@@ -359,6 +402,7 @@
   // -----------------------------
   function buildLevel() {
     let checkpointCounter = 0;
+    let familyIndex = 0;
 
     for (let row = 0; row < ROWS; row++) {
       const line = MAP[row];
@@ -381,7 +425,8 @@
             game.enemy = new Enemy(x + TILE * 0.1, y + TILE * 0.1);
             break;
           case "F":
-            game.family.push(new FamilyMember(x, y));
+            game.family.push(new FamilyMember(x, y, familyIndex));
+            familyIndex++;
             break;
           case "C":
             game.checkpoints.push(

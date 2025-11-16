@@ -273,6 +273,7 @@ main > section button:active {
   max-height: 300px;
   overflow-y: auto;
   margin-bottom: 12px;
+  color: #ffeefc; 
 }
 
 .checkpoint-card {
@@ -280,15 +281,18 @@ main > section button:active {
   padding: 10px;
   margin-bottom: 8px;
   background: #130319;
+  color: #ffeefc; 
 }
 
 .checkpoint-card h3 {
   font-size: 12px;
   margin-bottom: 4px;
+  color: #ffeefc; 
 }
 
 .checkpoint-card p {
   font-size: 10px;
+  color: #ffeefc; 
 }
 
 .overlay-content button {
@@ -310,4 +314,10 @@ main > section button:active {
 
 .hidden {
   display: none;
+}
+
+/* Make Game Over page text white */
+body.gameover-page,
+body.gameover-page * {
+  color: #ffffff !important;
 }
