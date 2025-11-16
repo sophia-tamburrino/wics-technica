@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Notes Page</title>
+    <style>
+        body {
+            background-image: url('background.gif');
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: center;
+            background-color: black;
+            color: rgb(0, 255, 213);
+            font-family: Arial, sans-serif;
+            text-align: center;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 30px;
+            margin-bottom: 20px;
+        }
+
+        .input-box, .notes-box {
+            width: 300px;
+            padding: 10px;
+            border: 2px solid rgb(0, 255, 213);
+            background-color: black;
+            color: rgb(0, 255, 213);
+            margin-bottom: 20px;
+        }
+
+        .notes-box {
+            height: 150px;
+        }
+
+        input[type="file"] {
+            margin: 10px 0 20px 0;
+        }
+
+        button {
+            font-size: 25px;
+            padding: 15px 30px;
+            cursor: pointer;
+            background-color: rgb(0, 255, 213);
+            border: none;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: rgb(0, 255, 213);
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Enter a txt file or type/paste notes</h1>
+
+    <input 
+        type="text" 
+        class="input-box" 
+        placeholder="Enter Topic Here"
+    >
+
+    <input type="file">
+
+    <textarea 
+        class="notes-box" 
+        placeholder="Type or paste your notes here..."
+    ></textarea>
+
+    <button>CONVERT TO TXT FILE</button>
+    <button>NEXT</button>
+    
+
+</body>
+</html>
