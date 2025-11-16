@@ -2,6 +2,9 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import uuid
+import re 
+# ✅ NEW: import our Ollama-based generator
+from questions import flashcards as generate_flashcards_df
 
 app = Flask(__name__)
 CORS(app)  # lets the game/frontend call this from another port (e.g. GameMaker HTML)
@@ -263,22 +266,93 @@ def submit_final_quiz():
 
 
 # ---------------------------------------------------------
-# STUB HELPERS – replace these with AI-backed logic later
-# Right now they just return dummy data in the right shape.
+# AI-backed helpers (flashcards + quizzes)
 # ---------------------------------------------------------
+import re  # make sure this is at the top of app.py if it's not already
 
 def get_flashcards_for_checkpoint(session_id: str, lesson: int, checkpoint_idx: int):
-    # flashcards are front/back
-    return [
-        {
-            "front": f"Lesson {lesson}, checkpoint {checkpoint_idx}: What is the key idea?",
-            "back": "This is a dummy answer. AI will generate real explanations later."
-        }
-    ]
+    """
+    Parse os-notes.txt into flashcards.
 
+    Heuristic:
+    - Lines that look like "9/2", "9/4" etc. are dates → used as boundaries.
+    - Lines that are non-empty and NOT starting with '*' or '-' are treated as section titles.
+    - Bullets under a title belong to that title.
+    - Each title + its bullets becomes one flashcard:
+        front: the title (maybe prefixed as a question)
+        back: all the bullet lines joined.
+    """
+    try:
+        with open("os-notes.txt", "r", encoding="utf-8") as f:
+            raw = f.read()
+    except Exception as e:
+        print("ERROR reading os-notes.txt:", e)
+        return [
+            {
+                "front": "Error reading os-notes.txt",
+                "back": str(e),
+            }
+        ]
+
+    lines = [ln.rstrip() for ln in raw.splitlines()]
+
+    flashcards = []
+    current_title = None
+    buffer = []
+
+    def flush_card():
+        nonlocal current_title, buffer
+        if current_title and buffer:
+            # make the question a bit more explicit
+            front = f"{current_title}"
+            back = "\n".join(buffer).strip()
+            flashcards.append({"front": front, "back": back})
+        current_title = None
+        buffer = []
+
+    for line in lines:
+        stripped = line.strip()
+
+        # skip totally empty lines
+        if not stripped:
+            continue
+
+        # date lines like "9/2", "9/4", "11/11", etc. → boundary
+        if re.match(r"^\d{1,2}/\d{1,2}$", stripped):
+            flush_card()
+            continue
+
+        # heading: not a bullet and not an emoji-only line
+        if not stripped.startswith("*") and not stripped.startswith("-"):
+            # new heading → flush previous card, start new one
+            flush_card()
+            current_title = stripped
+            buffer = []
+        else:
+            # bullet or detail line → belongs to current_title
+            # strip leading bullet markers
+            cleaned = stripped.lstrip("*").lstrip("-").strip()
+            if not current_title:
+                # if we somehow get bullets before a heading, just skip them
+                continue
+            buffer.append(cleaned)
+
+    # flush last card
+    flush_card()
+
+    if not flashcards:
+        return [
+            {
+                "front": "No flashcards parsed from os-notes.txt",
+                "back": "Check the note formatting or adjust get_flashcards_for_checkpoint.",
+            }
+        ]
+
+    return flashcards
 
 def get_quiz_for_lesson(session_id: str, lesson: int):
     # questions are multiple-choice
+    # (still dummy for now; can be wired to questions.quiz() later)
     return [
         {
             "id": f"q{lesson}_1",
@@ -296,8 +370,6 @@ def get_quiz_for_lesson(session_id: str, lesson: int):
 
 
 def check_lesson_quiz_answers(session_id: str, lesson: int, answers: list):
-    # In a real version, you’d look up stored questions for this session_id + lesson.
-    # For now, we just compare against the dummy get_quiz_for_lesson() above.
     questions = get_quiz_for_lesson(session_id, lesson)
     by_id = {q["id"]: q for q in questions}
 
@@ -328,7 +400,6 @@ def get_final_quiz_questions(session_id: str):
             "correct_index": 0
         }
     ]
-
 
 def check_final_quiz_answers(session_id: str, answers: list):
     questions = get_final_quiz_questions(session_id)

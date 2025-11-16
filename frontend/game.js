@@ -58,26 +58,25 @@
   // Map layout
   // W = wall, . = pumpkin, P = player, E = enemy, F = family, C = checkpoint
   // -----------------------------
- const RAW_MAP = [
-  "WWWWWWWWWWWWWWWWWWWWWWWWW", 
-  "WF....W....C...P..W.E.F.W", 
-  "W.....W........P..W.....W", 
-  "W..W.....WWWWWWW..C..W..W", 
-  "W..W.................W..W", 
-  "W..WWW.............WWW..W", 
-  "W..W.................W..WW", 
-  "W..W....WWW...WWW....W..W", 
-  "W...........P...........WW", 
-  "W...C...................W", 
-  "W.......WWW...WWW.......W", 
-  "W..WWW.............WWW..W", 
-  "W..W.................W..W", 
-  "W..W.....WWWWWWW.....W..W", 
-  "WF.E..W.....C.....W...F.W", 
-  "W.....W...........W.....W", 
-  "WWWWWWWWWWWWWWWWWWWWWWWWW"  
-];
-
+  const RAW_MAP = [
+    "WWWWWWWWWWWWWWWWWWWWWWWWW", 
+    "WF....W....C...P..W.E.F.W", 
+    "W.....W........P..W.....W", 
+    "W..W.....WWWWWWW..C..W..W", 
+    "W..W.................W..W", 
+    "W..WWW.............WWW..W", 
+    "W..W.................W..WW", 
+    "W..W....WWW...WWW....W..W", 
+    "W...........P...........WW", 
+    "W...C...................W", 
+    "W.......WWW...WWW.......W", 
+    "W..WWW.............WWW..W", 
+    "W..W.................W..W", 
+    "W..W.....WWWWWWW.....W..W", 
+    "WF.E..W.....C.....W...F.W", 
+    "W.....W...........W.....W", 
+    "WWWWWWWWWWWWWWWWWWWWWWWWW"  
+  ];
 
   const MAP = [];
   for (let r = 0; r < ROWS; r++) {
@@ -109,9 +108,82 @@
   const checkpointCards = document.getElementById("checkpoint-cards");
   const checkpointClose = document.getElementById("checkpoint-close");
 
+  // ---------- NEW: flashcard overlay state ----------
+  let checkpointFlashcards = [];
+  let currentFlashcardIndex = 0;
+  let showingBack = false;
+
+  function renderCurrentFlashcard() {
+    if (!checkpointFlashcards.length) {
+      checkpointCards.innerHTML = "<p>No flashcards returned yet.</p>";
+      return;
+    }
+
+    const fc = checkpointFlashcards[currentFlashcardIndex];
+    const front = fc.front || "";
+    const back = fc.back || "";
+    const total = checkpointFlashcards.length;
+    const idx = currentFlashcardIndex + 1;
+
+    checkpointCards.innerHTML = "";
+
+    const cardDiv = document.createElement("div");
+    cardDiv.className = "checkpoint-card";
+    cardDiv.innerHTML = `
+      <h3>${showingBack ? "Answer" : "Question"} (${idx}/${total})</h3>
+      <p>${showingBack ? back : front}</p>
+      <small class="checkpoint-hint">
+        Click card or press SPACE to flip. Use &larr; / &rarr; to switch cards. ESC or Close to return to the game.
+      </small>
+    `;
+
+    // Flip card on click
+    cardDiv.addEventListener("click", () => {
+      showingBack = !showingBack;
+      renderCurrentFlashcard();
+    });
+
+    checkpointCards.appendChild(cardDiv);
+  }
+
   checkpointClose.addEventListener("click", () => {
     checkpointOverlay.classList.add("hidden");
     game.running = true;
+  });
+
+  // Keyboard controls for flashcards in overlay
+  window.addEventListener("keydown", (e) => {
+    // Only handle these keys if overlay is visible
+    if (checkpointOverlay.classList.contains("hidden")) return;
+
+    if (e.key === " ") {
+      // SPACE: flip front/back
+      e.preventDefault();
+      if (!checkpointFlashcards.length) return;
+      showingBack = !showingBack;
+      renderCurrentFlashcard();
+    } else if (e.key === "ArrowRight") {
+      // Next card
+      e.preventDefault();
+      if (currentFlashcardIndex < checkpointFlashcards.length - 1) {
+        currentFlashcardIndex++;
+        showingBack = false;
+        renderCurrentFlashcard();
+      }
+    } else if (e.key === "ArrowLeft") {
+      // Previous card
+      e.preventDefault();
+      if (currentFlashcardIndex > 0) {
+        currentFlashcardIndex--;
+        showingBack = false;
+        renderCurrentFlashcard();
+      }
+    } else if (e.key === "Escape") {
+      // ESC: close overlay
+      e.preventDefault();
+      checkpointOverlay.classList.add("hidden");
+      game.running = true;
+    }
   });
 
   // -----------------------------
@@ -373,20 +445,15 @@
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
 
-      const cards = data.flashcards || [];
-      if (!cards.length) {
+      // NEW: store cards and show only ONE at a time
+      checkpointFlashcards = data.flashcards || [];
+      currentFlashcardIndex = 0;
+      showingBack = false;
+
+      if (!checkpointFlashcards.length) {
         checkpointCards.innerHTML = "<p>No flashcards returned yet.</p>";
       } else {
-        checkpointCards.innerHTML = "";
-        for (const fc of cards) {
-          const div = document.createElement("div");
-          div.className = "checkpoint-card";
-          div.innerHTML = `
-            <h3>${fc.front}</h3>
-            <p>${fc.back}</p>
-          `;
-          checkpointCards.appendChild(div);
-        }
+        renderCurrentFlashcard();
       }
     } catch (err) {
       console.error(err);
