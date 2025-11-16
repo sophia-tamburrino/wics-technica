@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<link rel="stylesheet" href="style.css" />
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Game – Name </title>
+</head>
+<body>
+  <header>
+    <button onclick="window.location.href='index.html'">Exit</button>
+    <button onclick="window.location.reload()">Restart</button>
+    <button onclick="document.getElementById('help').style.display='block'">
+      Help
+    </button>
+  </header>
+
+  <main>
+    <section id="help" style="display:none;">
+      <h2>How to Play</h2>
+      <p>
+        Move through the maze, reach checkpoints to see flashcards, and find ghosts
+        to take quizzes. Answer correctly to reunite your ghost family!
+      </p>
+      <button onclick="document.getElementById('help').style.display='none'">
+        Close
+      </button>
+    </section>
+
+    <section id="game-container">
+      <!-- GameMaker HTML export can be embedded here later -->
+      <p>Game goes here (embed GameMaker HTML/Canvas).</p>
+    </section>
+  </main>
+</body>
+</html>
