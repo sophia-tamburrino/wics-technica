@@ -35,7 +35,7 @@ def person():
 @app.route('/game', methods=['GET', 'POST'])
 def game():
   if request.method == 'POST':
-    file = request.form['userfile']
+    file = request.files.get['userfile']
     # Redirect to loading page, and once the dataframes are done developing, pass them into game template
     redirect('loading.html')
     flashcard_data = flashcards(file)

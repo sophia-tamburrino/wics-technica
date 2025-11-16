@@ -69,9 +69,9 @@
         id="topic" 
     >
 
-    <form action="/loading" method="GET">
+    <form action="/game" method="POST">
     <input name="userfile" id="userfile" type="file">
-    </form>
+    
 
     <textarea 
         class="notes-box" 
@@ -111,45 +111,5 @@
         });
     </script>
     <!-- end changed -->
-
-    <script>
-      // existing script for "CONVERT TO TXT FILE" can stay above this
-        var filepath = document.getElementById('userfile')
-        
-      
-      
-      
-      
-      
-        async function startSessionAndGoToGame() {
-        try {
-          // You can choose any number of lessons; using 3 as an example
-          const res = await fetch("http://127.0.0.1:5000/start-session", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ num_lessons: 3 })
-          });
-
-          if (!res.ok) {
-            throw new Error("Backend error");
-          }
-
-          const data = await res.json();
-          console.log("Session started:", data);
-
-          // Save the session id so the next page / game can use it
-          localStorage.setItem("session_id", data.session_id);
-
-          // Go to the character selection page instead of game.html   // changed
-          window.location.href = "person.html";                        // changed
-        } catch (err) {
-          console.error(err);
-          alert("Could not talk to the backend. Is app.py running?");
-        }
-      }
-
-      document.getElementById("nextBtn")
-        .addEventListener("click", startSessionAndGoToGame);
-    </script>
 </body>
 </html>
