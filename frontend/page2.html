@@ -1,10 +1,11 @@
 <!DOCTYPE html>
+
 <html>
 <head>
     <title>Notes Page</title>
     <style>
         body {
-            background-image: url('background.gif');
+            background-image: url("/assets/spooky-bg.gif");  /* we'll fix path in step 2 */
             background-repeat: no-repeat;
             background-size: cover;
             background-position: center;
@@ -65,6 +66,7 @@
         type="text" 
         class="input-box" 
         placeholder="Enter Topic Here"
+        id="topic" 
     >
 
     <input type="file">
@@ -72,11 +74,41 @@
     <textarea 
         class="notes-box" 
         placeholder="Type or paste your notes here..."
+        id="notes" 
     ></textarea>
 
-    <button>CONVERT TO TXT FILE</button>
+    <button id="downloadBtn">CONVERT TO TXT FILE</button> <!-- changed -->
     <button>NEXT</button>
     
+    <!-- changed: added script block to convert textarea content into a downloadable .txt file -->
+    <script>
+        document.getElementById('downloadBtn').addEventListener('click', function () {
+            const notes = document.getElementById('notes').value;
+            const topicInput = document.getElementById('topic').value.trim();
+
+            if (!notes.trim()) {
+                alert('Please type or paste some notes first.');
+                return;
+            }
+
+            // Use topic as filename, or fallback to "notes"
+            let filename = topicInput || 'notes';
+            // Make filename safe
+            filename = filename.replace(/[^\w\-]+/g, '_') + '.txt';
+
+            const blob = new Blob([notes], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+        });
+    </script>
+    <!-- end changed -->
 
 </body>
 </html>
