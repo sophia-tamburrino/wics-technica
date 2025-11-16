@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="../loading-bar/dist/loading-bar.css"/>
+    <script type="text/javascript" src="../loading-bar/dist/loading-bar.js"></script>
+    <title>Loading</title>
+    <style>
+        body {
+            /* loading.html is in frontend/, assets/ is one level up */
+            background-image: url("../assets/spooky-bg.gif");
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: center;
+            background-color: rgb(255, 255, 255);
+            color: rgb(0, 255, 213);
+            font-family: Arial, sans-serif;
+            text-align: center;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center; /* center vertically */
+            align-items: center;      /* center horizontally */
+        }
+
+        img {
+            max-width: 200px; /* optional: control size */
+        }
+    </style>
+</head>
+<body>
+    <div id="myItem1" class="ldBar label-center" data-type="fill" data-img="../assets/cat-cute.gif"></div>
+    <script>
+        // Create the bar
+        var bar = new ldBar("#myItem1");
+
+        // Fake progress animation while waiting
+        let progress = 0;
+        let interval = setInterval(() => {
+            progress += 1;
+            bar.set(progress);
+
+            // Stop at 95% so it doesn't finish before backend responds
+            if (progress >= 80) {
+                clearInterval(interval);
+            }
+        }, 50);  // updates every 50ms
+
+        // Simulate waiting for AI backend:
+        // When your AI responds, call:
+        function backendFinished() {
+            clearInterval(interval);
+            bar.set(100);   // instantly finish
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<link rel="stylesheet" href="style.css" />
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Game – Name </title>
+</head>
+<body>
+  <header>
+    <button onclick="window.location.href='index.html'">Exit</button>
+    <button onclick="window.location.reload()">Restart</button>
+    <button onclick="document.getElementById('help').style.display='block'">
+      Help
+    </button>
+  </header>
+
+  <main>
+    <section id="help" style="display:none;">
+      <h2>How to Play</h2>
+      <p>
+        Move through the maze, reach checkpoints to see flashcards, and find ghosts
+        to take quizzes. Answer correctly to reunite your ghost family!
+      </p>
+      <button onclick="document.getElementById('help').style.display='none'">
+        Close
+      </button>
+    </section>
+
+    <section id="game-container">
+      <!-- GameMaker HTML export can be embedded here later -->
+      <p>Game goes here (embed GameMaker HTML/Canvas).</p>
+    </section>
+  </main>
+  <script>
+  // Get the session id we saved in page2.html
+  const sessionId = localStorage.getItem("session_id");
+
+  if (!sessionId) {
+    // If there is no session, send them back to notes page
+    window.location.href = "page2.html";
+  } else {
+    console.log("Using session:", sessionId);
+  }
+
+  async function loadFirstCheckpoint() {
+    try {
+      const url = `http://127.0.0.1:5000/checkpoint?session_id=${encodeURIComponent(
+        sessionId
+      )}&lesson=1&checkpoint=0`;
+
+      const res = await fetch(url);
+      if (!res.ok) {
+        throw new Error("Backend error");
+      }
+
+      const data = await res.json();
+      console.log("Flashcards from backend:", data.flashcards);
+
+      // For now, just show the first flashcard text on the page
+      const container = document.getElementById("game-container");
+      const fc = data.flashcards[0];
+
+      const card = document.createElement("div");
+      card.innerHTML = `
+        <h2>${fc.front}</h2>
+        <p>${fc.back}</p>
+      `;
+      container.appendChild(card);
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  loadFirstCheckpoint();
+</script>
+
+</body>
+</html>
